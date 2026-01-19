@@ -1,0 +1,65 @@
+{
+  "converted": [],
+  "failed": [
+    {
+      "pdf": "data\\abstracts\\1.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\1.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\10.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\10.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\11.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\11.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\12.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\12.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\13.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\13.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\14.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\14.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\15.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\15.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\2.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\2.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\3.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\3.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\4.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\4.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\5.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\5.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\6.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\6.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\7.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\7.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\8.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\8.pdf'"
+    },
+    {
+      "pdf": "data\\abstracts\\9.pdf",
+      "error": "[Errno 22] Invalid argument: 'file:\\\\C:\\\\Users\\\\asus\\\\OneDrive\\\\Documents\\\\multi-agent-playground\\\\MedGraph-RAG\\\\data\\\\abstracts\\\\9.pdf'"
+    }
+  ]
+}
