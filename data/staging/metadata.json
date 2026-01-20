@@ -1,0 +1,243 @@
+[
+  {
+    "id": "cc88f3e0-b532-4e7b-89d6-8ca0a467b989",
+    "title": "Recent advances in molecular pathways and therapeutic implications targeting neuroinflammation for Alzheimer's disease",
+    "authors": [
+      "Rishika Dhapola",
+      "Subhendu Shekhar Hota",
+      "Phulen Sarma",
+      "Anusuya Bhattacharyya",
+      "Bikash Medhi",
+      "Dibbanti HariKrishna Reddy"
+    ],
+    "sections_count": 26,
+    "source": "data\\markdowns\\1.md"
+  },
+  {
+    "id": "eaaf594b-db9d-47fd-828e-4e0404343b77",
+    "title": "HHS Public Access",
+    "authors": [
+      "Author manuscript",
+      "Biochim Biophys Acta Mol Cell Res. Author manuscript; available in PMC May."
+    ],
+    "sections_count": 17,
+    "source": "data\\markdowns\\10.md"
+  },
+  {
+    "id": "dfcacbd9-5dd1-40a6-91f8-d643833ed2ab",
+    "title": "HHS Public Access",
+    "authors": [
+      "Author manuscript",
+      "Lancet Neurol. Author manuscript; available in PMC December."
+    ],
+    "sections_count": 24,
+    "source": "data\\markdowns\\11.md"
+  },
+  {
+    "id": "39d8e39f-486f-452a-9e87-a94f975f81c8",
+    "title": "Tau degradation in Alzheimer's disease: Mechanisms and therapeutic opportunities",
+    "authors": [
+      "Lisha Wang Banesh Sooram Rajnish Kumar Sophia Schedin-Weiss",
+      "Lars O. Tjernberg",
+      "Bengt Winblad",
+      "Division of Neurogeriatrics",
+      "Department of Neurobiology",
+      "Care Sciences and Society",
+      "Karolinska Institutet",
+      "Solna",
+      "Sweden"
+    ],
+    "sections_count": 36,
+    "source": "data\\markdowns\\12.md"
+  },
+  {
+    "id": "f06f70d8-ecd3-4638-8b61-9f867ce2b0fc",
+    "title": "Current Topics",
+    "authors": [],
+    "sections_count": 9,
+    "source": "data\\markdowns\\13.md"
+  },
+  {
+    "id": "c7b54e2e-924d-4251-909f-4b10122bdc31",
+    "title": "Mechanism of quercetin therapeutic targets for Alzheimer disease and type ͸ diabetes mellitus",
+    "authors": [
+      "Guoxiu Zu ͷ",
+      "Keyun Sun ͷ",
+      "Ling Li ͷ",
+      "Xiuli Zu ͸",
+      "Tao Han ͹ * &amp; Hailiang Huang ͺ *",
+      "Quercetin has demonstrated antioxidant",
+      "anti-inflammatory",
+      "hypoglycemic",
+      "and hypolipidemic activities",
+      "suggesting therapeutic potential against type ͸ diabetes mellitus ȋT͸DMȌ and Alzheimer's disease ȋADȌ. In this study",
+      "potential molecular targets of quercetin were first identified using the Swiss Target Prediction platform and pathogenic targets of T͸DM and AD were identified using online Mendelian inheritance in man ȋOMIMȌ",
+      "DisGeNET",
+      "TTD",
+      "DrugBank",
+      "and GeneCards databases. Theͻ targets shared among quercetin",
+      "T͸DM",
+      "and AD were used to establish a protein-protein interaction ȋPPIȌ network",
+      "top ͸ͻ core genes",
+      "and protein functional modules using MCODE. Metascape was then used for gene ontology and kyoto encyclopedia of genes and genomes ȋKEGGȌ pathway enrichment analysis. A protein functional module with best score was obtained from the PPI network using CytoHubba",
+      "and ͼ high-probability quercetin targets ȋAKTͷ",
+      "JUN",
+      "MAPK",
+      "TNF",
+      "VEGFA",
+      "and EGFRȌ were confirmed by docking simulations. Molecular dynamics simulation was carried out according to the molecular docking results. KEGG pathway enrichment analysis suggested that the major shared mechanisms for T͸DM and AD include 'AGE-RAGE signaling pathway in diabetic complications",
+      "' 'pathways in cancer",
+      "' and 'MAPK signaling pathway' ȋthe key pathwayȌ. We speculate that quercetin may have therapeutic applications in T͸DM and AD by targeting MAPK signaling",
+      "providing a theoretical foundation for future clinical research.",
+      "According to the global burden of disease study",
+      "type diabetes mellitus (TDM) and Alzheimer's disease (AD) are the sixth and tenth leading causes of premature death   worldwide",
+      "and many studies have found strong epidemiological",
+      "pathological",
+      "and clinical associations between TDM and   AD . The incidence of AD is about twofold greater in TDM patients than in non-diabetic individuals",
+      "while a disproportionate number of AD patients have a history of early or clinical diabetes. Diabetes and AD also share numerous common risk factors",
+      "including metabolic disease (obesity)",
+      "cardiovascular disease",
+      "older age",
+      "and progressive insulin   resistance",
+      "as well as common pathogenic processes such as chronic hyperglycemia",
+      "tissue amyloid β (Aβ) deposition and toxicity",
+      "cellular oxidative stress",
+      "and chronic inflammation.",
+      "Indeed",
+      "the term 'type diabetes' has been proposed to describe AD based on the hypothesis that ADassociated dementia is caused in part by insulin resistance and insufficient insulin-like growth factor signaling in the   brain . It is believed that endocrine and metabolic diseases characterized by elevated blood glucose due to insulin resistance and death of insulin-producing pancreatic islet β-cells can lead to chronic cardiovascular diseases and ultimately to AD. Alzheimer's disease is characterized by the accumulation of Aβ in the brain parenchyma (termed senile plaques",
+      "SPs) and abnormal hyperphosphorylation of the intermediate filament protein tau within neurons",
+      "forming neurofibrillary tangles (NFTs). The presence of these inclusions results in synaptic loss",
+      "particularly in neocortex and hippocampus",
+      "oxidative stress",
+      "and neuroinflammation",
+      "ultimately leading to neuronal dysfunction and   death . Tau protein and human islet amyloid polypeptide (hIAPP) deposits are also found in the pancreatic islets of TDM patients. Moreover",
+      "pharmacological studies have shown that some traditional hypoglycemic drugs can slow the progression of   AD ."
+    ],
+    "sections_count": 11,
+    "source": "data\\markdowns\\14.md"
+  },
+  {
+    "id": "39640676-5f15-45b2-859e-ae8ae43438d8",
+    "title": "Open Access",
+    "authors": [],
+    "sections_count": 53,
+    "source": "data\\markdowns\\15.md"
+  },
+  {
+    "id": "423bbb94-4a88-4bc1-91fb-a40e94d1b64a",
+    "title": "Microglial mechanisms drive amyloid-β clearance in immunized patients with Alzheimer's disease",
+    "authors": [],
+    "sections_count": 58,
+    "source": "data\\markdowns\\2.md"
+  },
+  {
+    "id": "ddc049e9-b942-4617-8cda-64467cd5443e",
+    "title": "Neuropharmacology",
+    "authors": [],
+    "sections_count": 24,
+    "source": "data\\markdowns\\3.md"
+  },
+  {
+    "id": "92c4923d-23ae-41a5-a30a-ac05b56edd51",
+    "title": "Signal pathways in the treatment of Alzheimer ' s disease with traditional Chinese medicine",
+    "authors": [
+      "<!-- image -->",
+      "Min-Rui Ding a",
+      "Yan-Jie Qu a",
+      "Bing Hu b",
+      "Hong-Mei An c",
+      "<!-- image -->",
+      "- a Department of Neurology",
+      "Longhua Hospital",
+      "Shanghai University of Traditional Chinese Medicine",
+      "Shanghai",
+      "China",
+      "- b Institute of Traditional Chinese Medicine in Oncology",
+      "Department of Oncology",
+      "Longhua Hospital",
+      "Shanghai University of Traditional Chinese Medicine",
+      "Shanghai",
+      "China"
+    ],
+    "sections_count": 22,
+    "source": "data\\markdowns\\4.md"
+  },
+  {
+    "id": "e7e35aff-0470-4ab5-b93a-e4c41527d0f5",
+    "title": "NUTRITION AND AGING (Y GU, SECTION EDITOR)",
+    "authors": [],
+    "sections_count": 15,
+    "source": "data\\markdowns\\5.md"
+  },
+  {
+    "id": "5a3d0538-13c6-496e-a3cd-0a202783821b",
+    "title": "Promoting Alzheimer's disease research and therapy with stem cell technology",
+    "authors": [],
+    "sections_count": 48,
+    "source": "data\\markdowns\\6.md"
+  },
+  {
+    "id": "62dd71ed-0b6f-497c-acdb-a4d0e3102810",
+    "title": "Molecular genetics of early-onset Alzheimer's disease revisited",
+    "authors": [
+      "<!-- image -->",
+      "Rita Cacace a",
+      "Kristel Sleegers a",
+      "Christine Van Broeckhoven a",
+      "a Neurodegenerative Brain Diseases group",
+      "Department of Molecular Genetics",
+      "VIB",
+      "Antwerp",
+      "Belgium b Laboratory of Neurogenetics",
+      "Institute Born-Bunge",
+      "University of Antwerp",
+      "Antwerp",
+      "Belgium"
+    ],
+    "sections_count": 23,
+    "source": "data\\markdowns\\7.md"
+  },
+  {
+    "id": "3e81f091-7358-4206-9f89-59439d06d0b7",
+    "title": "Alzheimer's Disease and Type 2 Diabetes Mellitus: The Use of MCTOil and a Ketogenic Diet",
+    "authors": [
+      "Junpei Takeishi",
+      "Yasuko Tatewaki",
+      "Taizen Nakase",
+      "Yumi Takano",
+      "Naoki Tomita",
+      "Shuzo Yamamoto",
+      "Tatsushi Mutoh and Yasuyuki Taki",
+      "- Department of Aging Research and Geriatric Medicine",
+      "Institute of Development",
+      "Aging and Cancer",
+      "Tohoku University",
+      "Sendai-",
+      "Japan; junpei.takeishi.s@dc.tohoku.ac.jp (J.T.); yumi.takano.b@tohoku.ac.jp (Y.T.); naoki.tomita.b@tohoku.ac.jp (N.T.);",
+      "- shuzo.yamamoto.c@tohoku.ac.jp (S.Y.); tmutoh@tohoku.ac.jp (T.M.); yasuyuki.taki.c@tohoku.ac.jp (Y.T.)",
+      "- Department of Geriatric Medicine and Neuroimaging",
+      "Tohoku University Hospital",
+      "Sendai-",
+      "Japan",
+      "- Smart Aging Research Center",
+      "Tohoku University",
+      "Sendai-",
+      "Japan"
+    ],
+    "sections_count": 13,
+    "source": "data\\markdowns\\8.md"
+  },
+  {
+    "id": "4e128a80-e6aa-44a5-ad06-0379f6d50f28",
+    "title": "TREM2 and sTREM2 in Alzheimer's disease: from mechanisms to therapies",
+    "authors": [
+      "<!-- image -->",
+      "Lianshuai Zhang†",
+      "Xianyuan Xiang*†",
+      "Yahui Li",
+      "Guojun Bu and Xiao-Fen Chen*"
+    ],
+    "sections_count": 29,
+    "source": "data\\markdowns\\9.md"
+  }
+]
