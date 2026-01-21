@@ -14,4 +14,7 @@ dependencies = [
     "pydantic>=2.12.5",
     "python-dotenv>=1.2.1",
     "ragas>=0.2.0",
+    "langgraph>=0.2.0",
+    "langchain-community>=0.3.0",
+    "langchain-google-vertexai>=2.0.0",
 ]
