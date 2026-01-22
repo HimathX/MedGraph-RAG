@@ -1,4 +1,4 @@
-# Medical Graph RAG — Medical Evidence & Hypothesis Generator 
+# Medical Graph RAG — Medical Evidence & Hypothesis Generator
 
 A compact project that analyzes a small collection of medical abstracts (e.g., PubMed) to discover non-obvious relationships between symptoms, treatments, and biological pathways using a graph-based RAG (Retrieval-Augmented Generation) approach.
 
@@ -18,6 +18,33 @@ A compact project that analyzes a small collection of medical abstracts (e.g., P
 
 ```
 (Drug:Lisinopril)-[:TREATS]->(Condition:Hypertension)
+```
+
+## 📊 Project Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     PHASE 1: PDF INGESTION                      │
+│  Docling/MinerU → Layout-Aware Markdown → Staging Environment   │
+└────────────────────┬────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│            PHASE 2: ENTITY EXTRACTION & NORMALIZATION           │
+│  LLM Triplets → Entity Resolution (SapBERT) → Neo4j Ingestion   │
+└────────────────────┬────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│         PHASE 3: HYBRID RETRIEVAL & MULTI-HOP REASONING         │
+│  Vector Similarity + Graph Traversal → LangGraph Reasoning      │
+└────────────────────┬────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│        PHASE 4: EVALUATION & CITATION-BACKED UI (Streamlit)     │
+│  RAGAS Evaluation → Precision Citations → Dashboard with Evidence│
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ## ✨ The "Graph RAG" Advantage
@@ -59,4 +86,3 @@ Specialized Medical Graph RAG frameworks are gaining traction for handling priva
 ## Contributing & License
 
 Contributions welcome. See the `LICENSE` file for license details.
-
