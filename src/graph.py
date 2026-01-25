@@ -32,6 +32,42 @@ class Neo4jManager:
                         authors=doc.get("authors"),
                         source_path=doc.get("source_path"))
 
+    def add_section(self, section: Dict):
+        """Creates Section node and links to Document."""
+        query = """
+        MERGE (s:Section {id: $id})
+        SET s.title = $title,
+            s.level = $level
+        
+        WITH s
+        MATCH (d:Document {id: $document_id})
+        MERGE (s)-[:PART_OF]->(d)
+        """
+        with self.driver.session() as session:
+            session.run(query,
+                        id=section.get("id"),
+                        title=section.get("title"),
+                        level=section.get("level"),
+                        document_id=section.get("document_id"))
+
+    def add_chunk(self, chunk: Dict):
+        """Creates Chunk node and links to Section."""
+        query = """
+        MERGE (c:Chunk {id: $id})
+        SET c.content = $content,
+            c.embedding = $embedding
+        
+        WITH c
+        MATCH (s:Section {id: $section_id})
+        MERGE (c)-[:PART_OF]->(s)
+        """
+        with self.driver.session() as session:
+            session.run(query,
+                        id=chunk.get("id"),
+                        content=chunk.get("content"),
+                        embedding=chunk.get("embedding"),
+                        section_id=chunk.get("section_id"))
+
     def add_triplets(self, triplets: List[Dict]):
         """
         Batch inserts triplets.

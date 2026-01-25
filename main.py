@@ -54,26 +54,22 @@ async def ingest_data(data_dir: Path):
                 # 5. Create Chunks with Embeddings (Phase 3)
                 print(f"   Creating chunks with embeddings...")
                 for section in document.sections:
+                    # Create Section Node
+                    manager.add_section(section.model_dump())
+                    
                     if section.content and len(section.content) > 50:
                         # Create embedding
                         embedding = embeddings.embed_query(section.content)
                         
-                        # Store chunk in Neo4j
-                        chunk_query = """
-                        CREATE (c:Chunk {
-                            id: $chunk_id,
-                            content: $content,
-                            section_id: $section_id,
-                            embedding: $embedding
-                        })
-                        """
-                        with manager.driver.session() as session:
-                            session.run(chunk_query, 
-                                      chunk_id=section.id,
-                                      content=section.content,
-                                      section_id=section.id,
-                                      embedding=embedding)
-                print(f"   ✅ Created chunks with embeddings.")
+                        # Create Chunk Node (1-to-1 with Section for now)
+                        chunk_data = {
+                            "id": f"chunk_{section.id}", # distinct ID from section
+                            "content": section.content,
+                            "embedding": embedding,
+                            "section_id": section.id
+                        }
+                        manager.add_chunk(chunk_data)
+                print(f"   ✅ Created sections and chunks with embeddings.")
                 
             except Exception as e:
                 print(f"❌ Failed to process {file_path.name}: {e}")
@@ -158,3 +154,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+# python main.py --mode ingest --data-dir data/markdowns
+# python main.py --mode query
+# uv run streamlit run app.py

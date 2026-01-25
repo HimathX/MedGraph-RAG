@@ -10,7 +10,7 @@ class AgentState(TypedDict):
     query: str
     plan: List[str]
     current_step: int
-    context: Annotated[List[str], operator.add]
+    context: Annotated[List[dict], operator.add]
     answer: str
     reflection: str
 
@@ -61,14 +61,15 @@ class ReasoningAgent:
         print(f"Executing: {current_task}")
         
         # Decide Local vs Global (simplified: just do Hybrid)
-        result = await self.retriever.retrieve(current_task)
+        # Result is now a List[Dict] containing structured docs with metadata
+        results = await self.retriever.retrieve(current_task)
         
-        return {"context": [result]}
+        return {"context": results}
 
     async def reflect_node(self, state: AgentState):
         """Reflects on whether we have enough info."""
         print("--- REFLECT ---")
-        context_str = "\n".join(state["context"])
+        context_str = "\n".join([f"[{c.get('source', 'UNKNOWN').upper()}] {c.get('content', '')}" for c in state["context"]])
         prompt = f"""
         Query: {state['query']}
         Current Context: {context_str}
@@ -89,7 +90,7 @@ class ReasoningAgent:
     async def synthesis_node(self, state: AgentState):
         """Generates the final answer."""
         print("--- SYNTHESIS ---")
-        context_str = "\n".join(state["context"])
+        context_str = "\n".join([f"[{c.get('source', 'UNKNOWN').upper()}] {c.get('content', '')}" for c in state["context"]])
         prompt = f"""
         Answer the query based strictly on the context.
         Query: {state['query']}

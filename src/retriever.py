@@ -23,7 +23,9 @@ class HybridRetriever:
         cypher = f"""
         CALL db.index.vector.queryNodes($index_name, $k, $embedding)
         YIELD node, score
-        RETURN node.content AS content, node.metadata AS metadata, score, elementId(node) as id
+        MATCH (node)-[:PART_OF]->(s:Section)-[:PART_OF]->(d:Document)
+        RETURN node.content AS content, score, elementId(node) as id,
+               d.title AS doc_title, s.title AS section_title, d.source AS source
         """
         
         with self.neo4j.driver.session() as session:
@@ -33,7 +35,16 @@ class HybridRetriever:
                                    k=k, 
                                    embedding=query_embedding)
                 return [
-                    {"content": r["content"], "score": r["score"], "source": "vector"} 
+                    {
+                        "content": r["content"], 
+                        "score": r["score"], 
+                        "source": "vector",
+                        "metadata": {
+                            "doc_title": r["doc_title"],
+                            "section_title": r["section_title"],
+                            "source_path": r["source"]
+                        }
+                    } 
                     for r in result
                 ]
             except Exception as e:
@@ -98,7 +109,4 @@ class HybridRetriever:
         # Combine and format
         all_docs = local_results + global_results
         
-        context_str = "\n\n".join(
-            [f"[{d['source'].upper()}] {d['content']}" for d in all_docs]
-        )
-        return context_str
+        return all_docs
