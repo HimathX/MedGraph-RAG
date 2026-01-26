@@ -1,5 +1,7 @@
 import asyncio
-from typing import List, Dict, Any
+import time
+from datetime import datetime
+from typing import List, Dict, Any, Tuple
 from .llm import get_embeddings, get_llm
 from .graph import Neo4jManager
 from langchain_core.documents import Document as LangchainDocument
@@ -11,10 +13,13 @@ class HybridRetriever:
         self.llm = get_llm()
         self.vector_index_name = "chunk_vector_index"
 
-    def vector_search(self, query: str, k: int = 5) -> List[Dict]:
+    def vector_search(self, query: str, k: int = 5) -> Tuple[List[Dict], Dict[str, Any]]:
         """
         Local Search: Finds relevant text chunks using vector similarity.
+        Returns: (results, metadata)
         """
+        start_time = time.time()
+        
         # 1. Generate Query Embedding
         query_embedding = self.embeddings.embed_query(query)
         
@@ -34,7 +39,7 @@ class HybridRetriever:
                                    index_name=self.vector_index_name, 
                                    k=k, 
                                    embedding=query_embedding)
-                return [
+                results = [
                     {
                         "content": r["content"], 
                         "score": r["score"], 
@@ -47,15 +52,38 @@ class HybridRetriever:
                     } 
                     for r in result
                 ]
+                
+                execution_time = time.time() - start_time
+                metadata = {
+                    "query": query,
+                    "cypher": cypher,
+                    "result_count": len(results),
+                    "execution_time": execution_time,
+                    "timestamp": datetime.now().isoformat()
+                }
+                
+                return results, metadata
             except Exception as e:
                 print(f"Vector search failed: {e}")
-                return []
+                execution_time = time.time() - start_time
+                metadata = {
+                    "query": query,
+                    "cypher": cypher,
+                    "result_count": 0,
+                    "execution_time": execution_time,
+                    "timestamp": datetime.now().isoformat(),
+                    "error": str(e)
+                }
+                return [], metadata
 
-    async def retrieve_communities(self, query: str) -> List[Dict]:
+    async def retrieve_communities(self, query: str) -> Tuple[List[Dict], Dict[str, Any]]:
         """
         Global Search: Finds community summaries relevant to the query.
         For 2026 'Global Context', we look for communities that share entities with the query.
+        Returns: (results, metadata)
         """
+        start_time = time.time()
+        
         # 1. Extract potential entities from query (simple heuristic or LLM)
         # For prototype, we'll try to match exact entity names or use keywords
         # A better approach (2026) is using the LLM to map query -> entities -> communities
@@ -64,10 +92,11 @@ class HybridRetriever:
         # Find communities where the most relevant nodes live.
         
         # Let's ask Cypher to fuzzy match entities in query
+        # Fixed: Check for communityId existence before filtering
         cypher = """
         CALL db.index.fulltext.queryNodes("entity_text_index", $query) YIELD node, score
         MATCH (node)-[:RELATED_TO*1..2]-(other)
-        WHERE node.communityId IS NOT NULL
+        WHERE EXISTS(node.communityId) AND node.communityId IS NOT NULL
         RETURN DISTINCT node.communityId as communityId, count(other) as size
         ORDER BY size DESC
         LIMIT 3
@@ -89,24 +118,37 @@ class HybridRetriever:
         # Filter mostly relevant ones?
         # For prototype, simply return a text describing the top communities found via vector search connection
         
-        return [
+        results = [
             {"content": f"Community {c['communityId']}: Contains concepts {c['entities'][:5]}...", "source": "community"}
             for c in raw_communities[:3]
         ]
+        
+        execution_time = time.time() - start_time
+        metadata = {
+            "query": query,
+            "cypher": cypher,
+            "result_count": len(results),
+            "execution_time": execution_time,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        return results, metadata
 
-    async def retrieve(self, query: str) -> str:
+    async def retrieve(self, query: str) -> Tuple[List[Dict], List[Dict[str, Any]]]:
         """
         Combines Local and Global search results.
+        Returns: (all_docs, metadata_list)
         """
         # Run in parallel
         # Note: retrieve_communities is async, vector_search is sync (neo4j driver)
         # We wrap vector_search
         
         loop = asyncio.get_event_loop()
-        local_results = await loop.run_in_executor(None, self.vector_search, query)
-        global_results = await self.retrieve_communities(query)
+        local_results, local_metadata = await loop.run_in_executor(None, self.vector_search, query)
+        global_results, global_metadata = await self.retrieve_communities(query)
         
         # Combine and format
         all_docs = local_results + global_results
+        metadata_list = [local_metadata, global_metadata]
         
-        return all_docs
+        return all_docs, metadata_list

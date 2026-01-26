@@ -85,17 +85,83 @@ if prompt := st.chat_input("Ask a medical question..."):
             try:
                 result = asyncio.run(run_agent(prompt))
                 
-                # Show key steps from the result
-                if "plan" in result:
-                    st.subheader("Plan")
-                    for step in result["plan"]:
-                        st.markdown(f"- {step}")
+                # Display execution events in structured sections
+                execution_events = result.get("execution_events", [])
                 
-                # We could ideally capture the retrieving steps too if we modify the agent to stream
-                # For now, we show the final reflection
-                if "reflection" in result:
+                # Group events by type
+                plan_events = [e for e in execution_events if e.get("type") == "plan_created"]
+                tool_events = [e for e in execution_events if e.get("type") == "tool_call"]
+                reflection_events = [e for e in execution_events if e.get("type") == "reflection"]
+                answer_events = [e for e in execution_events if e.get("type") == "final_answer"]
+                
+                # 1. Planning Section
+                if plan_events:
+                    with st.expander("📋 Planning", expanded=True):
+                        for event in plan_events:
+                            st.markdown("**Generated Plan:**")
+                            for i, step in enumerate(event.get("plan", []), 1):
+                                st.markdown(f"{i}. {step}")
+                            st.caption(f"⏱️ {event.get('timestamp', 'N/A')}")
+                
+                # 2. Tool Execution Section
+                if tool_events:
+                    with st.expander("🔧 Tool Execution", expanded=True):
+                        for i, event in enumerate(tool_events, 1):
+                            st.markdown(f"**Tool {i}: {event.get('tool_name', 'Unknown')}**")
+                            
+                            # Display metrics in columns
+                            col1, col2, col3 = st.columns(3)
+                            with col1:
+                                st.metric("Results", event.get("result_count", 0))
+                            with col2:
+                                st.metric("Time (s)", f"{event.get('execution_time', 0):.3f}")
+                            with col3:
+                                st.caption(f"⏱️ {event.get('timestamp', 'N/A')}")
+                            
+                            # Show query details
+                            with st.expander(f"Query Details - Tool {i}"):
+                                st.text("Query:")
+                                st.code(event.get("query", "N/A"))
+                                st.text("Cypher:")
+                                st.code(event.get("cypher", "N/A"), language="cypher")
+                                if "error" in event:
+                                    st.error(f"Error: {event['error']}")
+                            
+                            st.divider()
+                
+                # 3. Reflection Section
+                if reflection_events:
+                    with st.expander("🤔 Reflection", expanded=True):
+                        for event in reflection_events:
+                            decision = event.get("decision", "UNKNOWN")
+                            context_count = event.get("context_count", 0)
+                            
+                            if "YES" in decision:
+                                st.success(f"✅ Sufficient information ({context_count} context items)")
+                            else:
+                                st.warning(f"⚠️ Need more information ({context_count} context items)")
+                            
+                            st.caption(f"⏱️ {event.get('timestamp', 'N/A')}")
+                
+                # 4. Answer Section
+                if answer_events:
+                    with st.expander("💡 Answer Generation", expanded=True):
+                        for event in answer_events:
+                            st.markdown(f"**Answer Length:** {event.get('answer_length', 0)} characters")
+                            st.caption(f"⏱️ {event.get('timestamp', 'N/A')}")
+                
+                # Display execution summary
+                if "execution_summary" in result:
                     st.divider()
-                    st.markdown(f"**Reflection:** {result['reflection']}")
+                    st.subheader("📊 Execution Summary")
+                    summary = result["execution_summary"]
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Tools Called", summary.get("tools_called", 0))
+                    with col2:
+                        st.metric("Results Retrieved", summary.get("results_retrieved", 0))
+                    with col3:
+                        st.metric("Total Time (s)", summary.get("execution_time_seconds", 0))
                     
                 status.update(label="✅ Reasoning Complete", state="complete", expanded=False)
                 
@@ -120,3 +186,4 @@ if prompt := st.chat_input("Ask a medical question..."):
             except Exception as e:
                 st.error(f"Error: {str(e)}")
                 status.update(label="❌ Failed", state="error")
+
