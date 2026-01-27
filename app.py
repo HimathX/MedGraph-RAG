@@ -99,9 +99,14 @@ if prompt := st.chat_input("Ask a medical question..."):
                     with st.expander("📋 Planning", expanded=True):
                         for event in plan_events:
                             st.markdown("**Generated Plan:**")
-                            for i, step in enumerate(event.get("plan", []), 1):
-                                st.markdown(f"{i}. {step}")
+                            # Display the plan as-is (it's now a single string)
+                            plan_content = event.get("plan", "")
+                            if isinstance(plan_content, list):
+                                # Fallback for old format
+                                plan_content = "\n".join(plan_content)
+                            st.markdown(plan_content)
                             st.caption(f"⏱️ {event.get('timestamp', 'N/A')}")
+
                 
                 # 2. Tool Execution Section
                 if tool_events:

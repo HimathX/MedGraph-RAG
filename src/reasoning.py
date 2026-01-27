@@ -49,14 +49,28 @@ class ReasoningAgent:
         print("--- PLAN ---")
         prompt = f"Break down this query into 2-3 step-by-step search tasks: {state['query']}"
         response = await self.llm.ainvoke(prompt)
-        # Simple parsing - assuming LLM gives newline separated steps
-        steps = [s.strip() for s in response.content.split('\n') if s.strip()]
         
-        # Emit event
+        # Store the raw content for display
+        raw_plan = response.content
+        
+        # Parse steps more intelligently - look for lines that start with "Step", "Task", or numbered patterns
+        # For execution, we'll extract the main task titles
+        lines = [s.strip() for s in raw_plan.split('\n') if s.strip()]
+        steps = []
+        for line in lines:
+            # Extract lines that look like task headers (Step X:, Task X:, or start with numbers)
+            if any(line.startswith(prefix) for prefix in ['Step ', 'Task ', '1.', '2.', '3.', '1)', '2)', '3)']):
+                steps.append(line)
+        
+        # If we didn't find structured steps, fall back to the first 3 non-empty lines
+        if not steps:
+            steps = lines[:3]
+        
+        # Emit event with raw plan for display
         event = {
             "type": "plan_created",
             "timestamp": datetime.now().isoformat(),
-            "plan": steps
+            "plan": raw_plan  # Store as single string instead of list
         }
         
         return {"plan": steps, "current_step": 0, "execution_events": [event]}
