@@ -217,6 +217,129 @@ class Neo4jManager:
             except Exception as e:
                 print(f"Error running community detection: {e}")
 
+    async def run_local_community_detection(self):
+        """
+        Fallback: Runs community detection locally using NetworkX + Python-Louvain.
+        Useful when GDS is not available on the Neo4j server.
+        """
+        import networkx as nx
+        import community.community_louvain as community_louvain
+
+        print("Fetching graph data...")
+        # 1. Fetch entire graph (Entities and Relationships)
+        query = """
+        MATCH (n:Entity)-[r:RELATED_TO]->(m:Entity)
+        RETURN n.name as source, m.name as target
+        """
+        
+        G = nx.Graph()
+        
+        with self.driver.session() as session:
+            result = session.run(query)
+            edges = [(r["source"], r["target"]) for r in result]
+            
+        if not edges:
+            print("No relationships found in graph. Cannot detect communities.")
+            return
+
+        print(f"Graph fetched: {len(edges)} edges. Building NetworkX graph...")
+        G.add_edges_from(edges)
+        
+        print("Running Louvain algorithm locally...")
+        # 2. Run Louvain
+        partition = community_louvain.best_partition(G)
+        # partition is a dict {node_name: community_id}
+        
+        print(f"Communities detected: {len(set(partition.values()))}. Writing back to Neo4j...")
+        
+        # 3. Write back in batches
+        update_query = """
+        UNWIND $batch as row
+        MATCH (e:Entity {name: row.name})
+        SET e.communityId = row.community_id
+        """
+        
+        batch_size = 1000
+        batch = []
+        count = 0
+        
+        with self.driver.session() as session:
+            for name, community_id in partition.items():
+                batch.append({"name": name, "community_id": community_id})
+                if len(batch) >= batch_size:
+                    session.run(update_query, batch=batch)
+                    count += len(batch)
+                    print(f"Updated {count}/{len(partition)} nodes...")
+                    batch = []
+            
+            if batch:
+                session.run(update_query, batch=batch)
+        
+        print("Community detection complete.")
+
+    async def run_local_community_detection(self):
+        """
+        Fallback: Runs community detection locally using NetworkX + Python-Louvain.
+        Useful when GDS is not available on the Neo4j server.
+        """
+        import networkx as nx
+        import community.community_louvain as community_louvain
+
+        print("Fetching graph data...")
+        # 1. Fetch entire graph (Entities and Relationships)
+        query = """
+        MATCH (n:Entity)-[r:RELATED_TO]->(m:Entity)
+        RETURN n.name as source, m.name as target
+        """
+        
+        G = nx.Graph()
+        
+        with self.driver.session() as session:
+            result = session.run(query)
+            edges = [(r["source"], r["target"]) for r in result]
+            
+        if not edges:
+            print("No relationships found in graph. Cannot detect communities.")
+            return
+
+        print(f"Graph fetched: {len(edges)} edges. Building NetworkX graph...")
+        G.add_edges_from(edges)
+        
+        print("Running Louvain algorithm locally...")
+        # 2. Run Louvain
+        try:
+            partition = community_louvain.best_partition(G)
+            # partition is a dict {node_name: community_id}
+            
+            print(f"Communities detected: {len(set(partition.values()))}. Writing back to Neo4j...")
+            
+            # 3. Write back in batches
+            update_query = """
+            UNWIND $batch as row
+            MATCH (e:Entity {name: row.name})
+            SET e.communityId = row.community_id
+            """
+            
+            batch_size = 1000
+            batch = []
+            count = 0
+            
+            with self.driver.session() as session:
+                for name, community_id in partition.items():
+                    batch.append({"name": name, "community_id": community_id})
+                    if len(batch) >= batch_size:
+                        session.run(update_query, batch=batch)
+                        count += len(batch)
+                        print(f"Updated {count}/{len(partition)} nodes...")
+                        batch = []
+                
+                if batch:
+                    session.run(update_query, batch=batch)
+            
+            print("Community detection complete.")
+        except Exception as e:
+            print(f"Local community detection failed: {e}")
+
     def get_community_summaries(self):
         """
         Retrieves aggregated text for communities to be summarized by LLM.
@@ -234,4 +357,6 @@ class Neo4jManager:
         with self.driver.session() as session:
             result = session.run(query)
             return [{"communityId": r["comId"], "entities": r["entities"]} for r in result]
+
+
 

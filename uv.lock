@@ -1663,9 +1663,11 @@ dependencies = [
     { name = "langchain-google-vertexai" },
     { name = "langgraph" },
     { name = "neo4j" },
+    { name = "networkx" },
     { name = "pubmed2pdf" },
     { name = "pydantic" },
     { name = "python-dotenv" },
+    { name = "python-louvain" },
     { name = "ragas" },
     { name = "streamlit" },
     { name = "streamlit-agraph" },
@@ -1681,9 +1683,11 @@ requires-dist = [
     { name = "langchain-google-vertexai", specifier = ">=2.0.0" },
     { name = "langgraph", specifier = ">=0.2.0" },
     { name = "neo4j", specifier = ">=5.20.0" },
+    { name = "networkx", specifier = ">=3.6.1" },
     { name = "pubmed2pdf", specifier = ">=0.0.7" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
+    { name = "python-louvain", specifier = ">=0.16" },
     { name = "ragas", specifier = ">=0.2.0" },
     { name = "streamlit", specifier = ">=1.39.0" },
     { name = "streamlit-agraph", specifier = ">=0.0.45" },
@@ -2860,6 +2864,16 @@ sdist = { url = "https://files.pythonhosted.org/packages/f0/26/19cadc79a718c5edb
 wheels = [
     { url = "https://files.pythonhosted.org/packages/14/1b/a298b06749107c305e1fe0f814c6c74aea7b2f1e10989cb30f544a1b3253/python_dotenv-1.2.1-py3-none-any.whl", hash = "sha256:b81ee9561e9ca4004139c6cbba3a238c32b03e4894671e181b671e8cb8425d61", size = 21230, upload-time = "2025-10-26T15:12:09.109Z" },
 ]
+
+[[package]]
+name = "python-louvain"
+version = "0.16"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "networkx" },
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7c/0d/8787b021d52eb8764c0bb18ab95f720cf554902044c6a5cb1865daf45763/python-louvain-0.16.tar.gz", hash = "sha256:b7ba2df5002fd28d3ee789a49532baad11fe648e4f2117cf0798e7520a1da56b", size = 204641, upload-time = "2022-01-29T15:53:03.532Z" }
 
 [[package]]
 name = "python-pptx"
