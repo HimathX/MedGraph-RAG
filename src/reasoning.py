@@ -140,11 +140,19 @@ class ReasoningAgent:
     async def synthesis_node(self, state: AgentState):
         """Generates the final answer."""
         print("--- SYNTHESIS ---")
-        context_str = "\n".join([f"[{c.get('source', 'UNKNOWN').upper()}] {c.get('content', '')}" for c in state["context"]])
+        context_str = "\n".join([f"[{i+1}] {c.get('content', '')}" for i, c in enumerate(state["context"])])
         prompt = f"""
-        Answer the query based strictly on the context.
+        Answer the query based strictly on the context provided below.
+        
+        IMPORTANT: When you reference information from a source, add a citation marker like [1], [2], etc. 
+        The numbers correspond to the source numbers below.
+        
         Query: {state['query']}
-        Context: {context_str}
+        
+        Context:
+        {context_str}
+        
+        Provide a comprehensive answer with inline citations.
         """
         response = await self.llm.ainvoke(prompt)
         
@@ -156,6 +164,44 @@ class ReasoningAgent:
         }
         
         return {"answer": response.content, "execution_events": [event]}
+
+    async def generate_followup_queries(self, state: AgentState) -> List[str]:
+        """
+        Generates intelligent follow-up questions based on the answer and discovered entities.
+        Returns a list of 3-4 suggested queries.
+        """
+        answer = state.get("answer", "")
+        context = state.get("context", [])
+        
+        # Extract entities mentioned in context
+        entities = []
+        for doc in context[:5]:  # Use top 5 docs to avoid token overflow
+            content = doc.get("content", "")
+            # Simple extraction - in production, use NER
+            entities.extend([word for word in content.split() if word[0].isupper() and len(word) > 3])
+        
+        entities = list(set(entities))[:10]  # Deduplicate and limit
+        
+        prompt = f"""Based on this medical research answer and the entities discovered, generate 3 follow-up questions that would help explore the knowledge graph deeper.
+
+Answer: {answer[:500]}...
+
+Key Entities: {', '.join(entities)}
+
+Generate questions that:
+1. Explore related biological pathways or mechanisms
+2. Find connections to other diseases or conditions  
+3. Discover recent research trends or contradictory findings
+
+Return ONLY the questions, one per line, without numbering."""
+
+        try:
+            response = await self.llm.ainvoke(prompt)
+            questions = [q.strip() for q in response.content.split('\n') if q.strip() and len(q.strip()) > 10]
+            return questions[:4]  # Return max 4 questions
+        except Exception as e:
+            print(f"Failed to generate follow-ups: {e}")
+            return []
 
     async def run(self, query: str):
         inputs = {
@@ -181,4 +227,9 @@ class ReasoningAgent:
             "execution_time_seconds": round(total_time, 2)
         }
         
+        # Generate follow-up suggestions
+        followup_queries = await self.generate_followup_queries(result)
+        result["followup_queries"] = followup_queries
+        
         return result
+

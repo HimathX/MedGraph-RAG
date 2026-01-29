@@ -47,7 +47,8 @@ class HybridRetriever:
                         "metadata": {
                             "doc_title": r["doc_title"],
                             "section_title": r["section_title"],
-                            "source_path": r["source"]
+                            "source_path": r["source"],
+                            "node_id": r["id"]
                         }
                     } 
                     for r in result
