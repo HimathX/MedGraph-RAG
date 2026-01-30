@@ -66,6 +66,15 @@ def render_evidence_graph(context):
     Creates an interactive graph visualization of entities and relationships
     discovered during retrieval.
     """
+    # Initialize session state for selected node
+    if "selected_node" not in st.session_state:
+        st.session_state.selected_node = None
+    
+    # If a node is selected, show node details with back button
+    if st.session_state.selected_node:
+        display_node_details(st.session_state.selected_node, context)
+        return
+    
     neo4j = Neo4jManager()
     
     # Combine all retrieved content (lowercase for matching)
@@ -139,7 +148,7 @@ def render_evidence_graph(context):
     MATCH (a:Entity)-[r:RELATED_TO]->(b:Entity)
     WHERE (a.name IN $entities OR b.name IN $entities)
     RETURN a.name as source, b.name as target, COALESCE(r.type, 'RELATED') as rel_type
-    LIMIT 40
+    LIMIT 30
     """
     
     nodes = []
@@ -178,7 +187,7 @@ def render_evidence_graph(context):
                     nodes.append(Node(
                         id=target_lower, 
                         label=target, 
-                        size=30,
+                        size=50,
                         color=color,
                         font={"color": "#FFFFFF", "size": 14, "strokeWidth": 2, "strokeColor": "#000000"}
                     ))
@@ -191,7 +200,7 @@ def render_evidence_graph(context):
                     target=target_lower, 
                     label=rel_type,
                     color="#FFD93D",
-                    font={"color": "#FFD93D", "size": 12, "strokeWidth": 1, "strokeColor": "#000"}
+                    font={"color": "#F5F5F5", "size": 12, "strokeWidth": 1, "strokeColor": "#000"}
                 ))
     
     except Exception as e:
@@ -207,18 +216,141 @@ def render_evidence_graph(context):
     
     # Configure graph with Neo-Brutalist styling
     config = Config(
-        width=750,
+        width=1250,
         height=550,
         directed=True,
         physics=True,
-        hierarchical=False,
+        hierarchical=True,
         nodeHighlightBehavior=True,
+        levelSeparation=1000, 
         highlightColor="#FFD93D",
         collapsible=False,
     )
     
     st.caption(f"Showing {len(nodes)} entities and {len(edges)} relationships")
-    agraph(nodes=nodes, edges=edges, config=config)
+    st.caption("💡 Click on any node to view detailed information")
+    
+    # Render graph and capture return value (selected node)
+    selected = agraph(nodes=nodes, edges=edges, config=config)
+    
+    # Handle node selection
+    if selected and isinstance(selected, str):
+        st.session_state.selected_node = selected
+        st.rerun()
+
+
+def display_node_details(node_id, context):
+    """
+    Display detailed information about a selected node with a back button.
+    """
+    # Back button at the top
+    if st.button("⬅️ Back to Graph", type="primary"):
+        st.session_state.selected_node = None
+        st.rerun()
+    
+    st.divider()
+    
+    neo4j = Neo4jManager()
+    
+    try:
+        # Query node details and relationships
+        node_query = """
+        MATCH (n:Entity {name: $node_name})
+        OPTIONAL MATCH (n)-[r]->(related:Entity)
+        RETURN n.name as name, 
+               collect(DISTINCT {target: related.name, relationship: type(r)}) as outgoing
+        UNION
+        MATCH (n:Entity {name: $node_name})
+        OPTIONAL MATCH (related:Entity)-[r]->(n)
+        RETURN n.name as name,
+               collect(DISTINCT {source: related.name, relationship: type(r)}) as incoming
+        """
+        
+        with neo4j.driver.session() as session:
+            # Try to find the node by case-insensitive match
+            result = session.run("""
+                MATCH (n:Entity)
+                WHERE toLower(n.name) = toLower($node_id)
+                RETURN n.name as actual_name
+                LIMIT 1
+            """, node_id=node_id)
+            
+            record = result.single()
+            if not record:
+                st.error(f"Node '{node_id}' not found in the graph.")
+                neo4j.close()
+                return
+            
+            actual_name = record["actual_name"]
+            
+            # Display node header
+            st.subheader(f"🔍 {actual_name}")
+            st.caption("Entity Details")
+            
+            st.divider()
+            
+            # Get relationships
+            outgoing_result = session.run("""
+                MATCH (n:Entity)-[r]->(related:Entity)
+                WHERE toLower(n.name) = toLower($node_id)
+                RETURN type(r) as rel_type, related.name as target
+                LIMIT 50
+            """, node_id=node_id)
+            
+            incoming_result = session.run("""
+                MATCH (related:Entity)-[r]->(n:Entity)
+                WHERE toLower(n.name) = toLower($node_id)
+                RETURN type(r) as rel_type, related.name as source
+                LIMIT 50
+            """, node_id=node_id)
+            
+            outgoing = list(outgoing_result)
+            incoming = list(incoming_result)
+            
+            # Display relationships in two columns
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("### 📤 Outgoing Relationships")
+                if outgoing:
+                    for rel in outgoing:
+                        st.markdown(f"- **{rel['rel_type']}** → `{rel['target']}`")
+                else:
+                    st.info("No outgoing relationships")
+            
+            with col2:
+                st.markdown("### 📥 Incoming Relationships")
+                if incoming:
+                    for rel in incoming:
+                        st.markdown(f"- `{rel['source']}` → **{rel['rel_type']}**")
+                else:
+                    st.info("No incoming relationships")
+            
+            st.divider()
+            
+            # Display related content from context
+            st.markdown("### 📄 Mentions in Retrieved Sources")
+            mentions_found = False
+            for idx, doc in enumerate(context):
+                content = doc.get("content", "").lower()
+                if actual_name.lower() in content:
+                    mentions_found = True
+                    with st.expander(f"Source {idx+1}: {doc.get('metadata', {}).get('doc_title', 'Unknown')}"):
+                        st.caption(f"Section: {doc.get('metadata', {}).get('section_title', 'Unknown')}")
+                        # Highlight the entity in the content
+                        highlighted_content = doc.get("content", "").replace(
+                            actual_name, 
+                            f"**{actual_name}**"
+                        )
+                        st.markdown(highlighted_content)
+            
+            if not mentions_found:
+                st.info(f"'{actual_name}' was not directly mentioned in the retrieved sources, but is connected through the knowledge graph.")
+            
+    except Exception as e:
+        st.error(f"Error loading node details: {e}")
+    finally:
+        neo4j.close()
 
 
 # Reasoning Agent Wrapper
@@ -241,12 +373,14 @@ if prompt := st.chat_input("Ask a medical question..."):
 
     # Generate Response
     with st.chat_message("assistant"):
-        with st.status("🧠 Thinking (Reasoning Trace)...", expanded=True) as status:
-            st.write("Initializing Agent...")
+        with st.status("🧠 Analyzing your question and searching the knowledge graph...", expanded=True) as status:
+            st.write("🔍 Retrieving relevant medical information...")
             
             # Run the agent (Async wrapper for streamlit)
             try:
                 result = asyncio.run(run_agent(prompt))
+                # Store result in session state so it persists across reruns
+                st.session_state.last_result = result
                 
                 # Display execution events in structured sections
                 execution_events = result.get("execution_events", [])
@@ -259,7 +393,7 @@ if prompt := st.chat_input("Ask a medical question..."):
                 
                 # 1. Planning Section
                 if plan_events:
-                    with st.expander("📋 Planning", expanded=True):
+                    with st.expander("📋 Planning", expanded=False):
                         for event in plan_events:
                             st.markdown("**Generated Plan:**")
                             # Display the plan as-is (it's now a single string)
@@ -273,7 +407,7 @@ if prompt := st.chat_input("Ask a medical question..."):
                 
                 # 2. Tool Execution Section
                 if tool_events:
-                    with st.expander("🔧 Tool Execution", expanded=True):
+                    with st.expander("🔧 Tool Execution", expanded=False):
                         for i, event in enumerate(tool_events, 1):
                             st.markdown(f"**Tool {i}: {event.get('tool_name', 'Unknown')}**")
                             
@@ -299,7 +433,7 @@ if prompt := st.chat_input("Ask a medical question..."):
                 
                 # 3. Reflection Section
                 if reflection_events:
-                    with st.expander("🤔 Reflection", expanded=True):
+                    with st.expander("🤔 Reflection", expanded=False):
                         for event in reflection_events:
                             decision = event.get("decision", "UNKNOWN")
                             context_count = event.get("context_count", 0)
@@ -313,7 +447,7 @@ if prompt := st.chat_input("Ask a medical question..."):
                 
                 # 4. Answer Section
                 if answer_events:
-                    with st.expander("💡 Answer Generation", expanded=True):
+                    with st.expander("💡 Answer Generation", expanded=False):
                         for event in answer_events:
                             st.markdown(f"**Answer Length:** {event.get('answer_length', 0)} characters")
                             st.caption(f"⏱️ {event.get('timestamp', 'N/A')}")
@@ -377,8 +511,15 @@ if prompt := st.chat_input("Ask a medical question..."):
                     st.subheader("📄 Source Inspector")
                     
                     if st.session_state.selected_citation is not None:
+                        # Back button at the top - prominent and easy to find
+                        if st.button("⬅️ Back", key="back_from_citation", type="primary"):
+                            st.session_state.selected_citation = None
+                            st.rerun()
+                        
                         cite_idx = st.session_state.selected_citation
-                        context = result.get("context", [])
+                        # Use session state to get context (persists across reruns)
+                        stored_result = st.session_state.get("last_result", {})
+                        context = stored_result.get("context", result.get("context", []))
                         
                         if 0 <= cite_idx < len(context):
                             doc = context[cite_idx]
@@ -397,10 +538,6 @@ if prompt := st.chat_input("Ask a medical question..."):
                                 height=300,
                                 label_visibility="collapsed"
                             )
-                            
-                            if st.button("Clear", key="clear_citation"):
-                                st.session_state.selected_citation = None
-                                st.rerun()
                         else:
                             st.info(f"Citation [{cite_idx + 1}] not found in sources.")
                     else:
