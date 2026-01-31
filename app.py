@@ -4,6 +4,7 @@ import os
 from src.reasoning import ReasoningAgent
 from streamlit_agraph import agraph, Node, Edge, Config
 from src.graph import Neo4jManager
+from src.evaluation import RAGASEvaluator, EvaluationLogger
 
 # Page Config
 st.set_page_config(
@@ -42,6 +43,26 @@ st.caption("Hybrid Retrieval & Chain-of-Graph Reasoning System")
 with st.sidebar:
     st.header("Configuration")
     model_name = st.selectbox("Model", ["gemini-2.0-flash", "gemini-2.0-pro (Coming Soon)"])
+    st.divider()
+    
+    # RAGAS Evaluation Settings
+    st.subheader("🎯 RAGAS Evaluation")
+    enable_ragas = st.checkbox("Enable Real-time Evaluation", value=False, 
+                               help="Evaluate each answer using RAGAS metrics")
+    
+    if enable_ragas:
+        faithfulness_threshold = st.slider(
+            "Faithfulness Threshold",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.7,
+            step=0.05,
+            help="Minimum faithfulness score to consider answer as non-hallucinated"
+        )
+        show_metrics = st.checkbox("Show Detailed Metrics", value=True)
+        log_evaluations = st.checkbox("Log Evaluations", value=True,
+                                     help="Save evaluation results to CSV")
+    
     st.divider()
     
     st.info("System Status: **Active**")
@@ -571,6 +592,94 @@ if prompt := st.chat_input("Ask a medical question..."):
                         with st.expander(f"Source {idx+1}: {doc.get('metadata', {}).get('doc_title', 'Unknown')}"):
                             st.caption(f"Section: {doc.get('metadata', {}).get('section_title', 'Unknown')}")
                             st.text(doc.get('content'))
+                
+                # RAGAS Evaluation Section (moved after All Sources)
+                if enable_ragas and "context" in result and result["context"]:
+                    st.divider()
+                    st.subheader("🎯 RAGAS Evaluation")
+                    
+                    with st.spinner("Evaluating answer quality..."):
+                        try:
+                            # Initialize evaluator
+                            evaluator = RAGASEvaluator()
+                            
+                            # Prepare contexts (extract content from context documents)
+                            context_texts = [doc.get("content", "") for doc in result["context"]]
+                            
+                            # Evaluate
+                            eval_result = evaluator.evaluate_single(
+                                question=prompt,
+                                answer=answer,
+                                contexts=context_texts
+                            )
+                            
+                            # Display metrics
+                            if show_metrics:
+                                col1, col2 = st.columns(2)
+                                
+                                with col1:
+                                    faithfulness_score = eval_result.get('faithfulness', 0.0)
+                                    
+                                    # Color-code based on threshold
+                                    if faithfulness_score >= faithfulness_threshold:
+                                        st.success(f"**Faithfulness:** {faithfulness_score:.3f} ✅")
+                                        st.caption("Answer is well-grounded in the sources")
+                                    else:
+                                        st.error(f"**Faithfulness:** {faithfulness_score:.3f} ⚠️")
+                                        st.caption("Potential hallucination detected!")
+                                
+                                with col2:
+                                    relevancy_score = eval_result.get('answer_relevancy', 0.0)
+                                    
+                                    if relevancy_score >= 0.7:
+                                        st.success(f"**Answer Relevancy:** {relevancy_score:.3f} ✅")
+                                    elif relevancy_score >= 0.5:
+                                        st.warning(f"**Answer Relevancy:** {relevancy_score:.3f} ⚠️")
+                                    else:
+                                        st.error(f"**Answer Relevancy:** {relevancy_score:.3f} ❌")
+                                
+                                # Show detailed breakdown in expander
+                                with st.expander("📊 Detailed Evaluation Metrics"):
+                                    st.json(eval_result)
+                                    
+                                    # Interpretation guide
+                                    st.markdown("""
+                                    **Metric Interpretation:**
+                                    - **Faithfulness (0-1):** Measures if the answer is factually consistent with the context. Higher is better.
+                                    - **Answer Relevancy (0-1):** Measures how well the answer addresses the question. Higher is better.
+                                    
+                                    **Thresholds:**
+                                    - ✅ Good: ≥ 0.7
+                                    - ⚠️ Moderate: 0.5 - 0.7
+                                    - ❌ Poor: < 0.5
+                                    """)
+                            else:
+                                # Compact view
+                                faithfulness_score = eval_result.get('faithfulness', 0.0)
+                                if faithfulness_score < faithfulness_threshold:
+                                    st.warning(f"⚠️ Low faithfulness score: {faithfulness_score:.3f}")
+                                else:
+                                    st.success(f"✅ Faithfulness: {faithfulness_score:.3f}")
+                            
+                            # Log evaluation if enabled
+                            if log_evaluations:
+                                logger = EvaluationLogger()
+                                logger.log_evaluation(
+                                    question=prompt,
+                                    answer=answer,
+                                    contexts=context_texts,
+                                    metrics=eval_result,
+                                    metadata={
+                                        "num_sources": len(result["context"]),
+                                        "model": model_name
+                                    }
+                                )
+                                st.caption("📝 Evaluation logged")
+                        
+                        except Exception as e:
+                            st.error(f"Evaluation failed: {str(e)}")
+                            st.caption("The system will continue without evaluation metrics")
+                
                 
                 # Save to history
                 st.session_state.messages.append({"role": "assistant", "content": answer})

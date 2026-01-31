@@ -21,4 +21,5 @@ dependencies = [
     "streamlit-agraph>=0.0.45",
     "networkx>=3.6.1",
     "python-louvain>=0.16",
+    "plotly>=6.5.2",
 ]
