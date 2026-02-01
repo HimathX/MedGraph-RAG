@@ -1,0 +1,18 @@
+# Auto-generated from pyproject.toml
+biopython>=1.86
+docling>=2.68.0
+langchain>=0.3.0
+langchain-google-genai>=4.2.0
+neo4j>=5.20.0
+pubmed2pdf>=0.0.7
+pydantic>=2.12.5
+python-dotenv>=1.2.1
+ragas>=0.2.0
+langgraph>=0.2.0
+langchain-community>=0.3.0
+langchain-google-vertexai>=2.0.0
+streamlit>=1.39.0
+streamlit-agraph>=0.0.45
+networkx>=3.6.1
+python-louvain>=0.16
+plotly>=6.5.2

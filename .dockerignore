@@ -1,0 +1,42 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.vscode/
+.idea/
+
+# Environment files (keep .env.example)
+.env
+.env.local
+
+# Documentation (optional - remove if you want docs in container)
+docs/
+*.md
+!README.md
+
+# Tests
+tests/
+.pytest_cache/
+
+# Local lock file (dependencies are in pyproject.toml)
+uv.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+*.bak
