@@ -42,7 +42,7 @@ st.caption("Hybrid Retrieval & Chain-of-Graph Reasoning System")
 # Sidebar
 with st.sidebar:
     st.header("Configuration")
-    model_name = st.selectbox("Model", ["gemini-2.0-flash", "gemini-2.0-pro (Coming Soon)"])
+    model_name = st.selectbox("Model", ["gemini-2.0-flash", ])
     st.divider()
     
     # RAGAS Evaluation Settings
@@ -75,6 +75,29 @@ with st.sidebar:
 # Initialize State
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+# Sample Questions for Demo (only show when chat is empty)
+if len(st.session_state.messages) == 0:
+    st.markdown("### 💡 Try These Sample Questions")
+    st.caption("Click any question below to get started:")
+    
+    sample_questions = [
+        "What are the early symptoms of Alzheimer's disease?",
+        "What treatments are available for Alzheimer's?",
+        "How does amyloid beta relate to Alzheimer's disease?",
+        "What lifestyle factors may reduce Alzheimer's risk?",
+        "What is the relationship between tau protein and neurodegeneration?"
+    ]
+    
+    cols = st.columns(2)
+    for idx, question in enumerate(sample_questions):
+        with cols[idx % 2]:
+            if st.button(f"💬 {question}", key=f"sample_{idx}", use_container_width=True):
+                # Store the selected query in session state
+                st.session_state.selected_sample_query = question
+                st.rerun()
+    
+    st.divider()
 
 # Display Chat History
 for message in st.session_state.messages:
@@ -385,8 +408,24 @@ async def run_agent(query: str):
     
     return await agent.run(query)
 
-# Input
-if prompt := st.chat_input("Ask a medical question..."):
+# Handle sample query clicks (auto-submit)
+if "selected_sample_query" in st.session_state and st.session_state.selected_sample_query:
+    prompt = st.session_state.selected_sample_query
+    st.session_state.selected_sample_query = None  # Clear it
+    
+    # Store as pending query to be processed below
+    st.session_state.pending_query = prompt
+
+# Check for pending query (from sample questions or suggestions)
+pending_prompt = st.session_state.pop("pending_query", None)
+
+# Always render chat input (must call to display it)
+chat_input = st.chat_input("Ask a medical question...")
+
+# Use pending prompt if available, otherwise use chat input
+prompt = pending_prompt if pending_prompt else chat_input
+
+if prompt:
     # Add User Message
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -694,8 +733,8 @@ if "suggested_query" in st.session_state and st.session_state.suggested_query:
     suggested = st.session_state.suggested_query
     st.session_state.suggested_query = None  # Clear it
     
-    # Add to messages
-    st.session_state.messages.append({"role": "user", "content": suggested})
+    # Store as pending query to be processed on next run
+    st.session_state.pending_query = suggested
     st.rerun()
 
 
