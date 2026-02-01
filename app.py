@@ -187,12 +187,12 @@ def render_evidence_graph(context):
     WHERE (a.name IN $entities OR b.name IN $entities)
     AND type(r) <> 'RELATED_TO'
     RETURN a.name as source, b.name as target, type(r) as rel_type
-    LIMIT 20
+    LIMIT 30
     UNION ALL
     MATCH (a:Entity)-[r:RELATED_TO]->(b:Entity)
     WHERE (a.name IN $entities OR b.name IN $entities)
     RETURN a.name as source, b.name as target, COALESCE(r.type, 'RELATED') as rel_type
-    LIMIT 20
+    LIMIT 30
     """
     
     nodes = []
@@ -265,10 +265,6 @@ def render_evidence_graph(context):
         directed=True,
         physics=True,
         hierarchical=True,
-        nodeHighlightBehavior=True,
-        levelSeparation=1000, 
-        highlightColor="#FFD93D",
-        collapsible=False,
     )
     
     st.caption(f"Showing {len(nodes)} entities and {len(edges)} relationships")
