@@ -1,88 +1,58 @@
-# Medical Graph RAG — Medical Evidence & Hypothesis Generator
+# 🧬 MedGraph-RAG
 
-A compact project that analyzes a small collection of medical abstracts (e.g., PubMed) to discover non-obvious relationships between symptoms, treatments, and biological pathways using a graph-based RAG (Retrieval-Augmented Generation) approach.
+### **Hybrid Retrieval & Chain-of-Graph Reasoning System**
 
----
+[![Medium Article](https://img.shields.io/badge/Read%20the%20Full%20Story-Medium-black?style=for-the-badge&logo=medium)](https://medium.com/@himath.nimpura/i-built-a-medical-knowledge-graph-because-vector-rag-is-dumb-sometimes-02e26e36c3dc)
 
-## 🚀 Overview
-
-- Purpose: Build a knowledge graph from medical abstracts and use it to support multi-hop reasoning and explainable evidence retrieval for research questions.
-- Scope: Small-scale prototype (20–50 abstracts) focused on a specific disease area (e.g., Alzheimer’s, Type 2 Diabetes).
-
-## 🔬 Graph Structure
-
-- **Nodes:** `Condition` (e.g., Diabetes), `Drug` (e.g., Metformin), `Gene/Protein`, `SideEffect`, `Study`.
-- **Edges:** `TREATS`, `ASSOCIATED_WITH`, `INHIBITS`, `REPORTED_IN`.
-
-**Example triplet:**
-
-```
-(Drug:Lisinopril)-[:TREATS]->(Condition:Hypertension)
-```
-
-## 📊 Project Flow
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     PHASE 1: PDF INGESTION                      │
-│  Docling/MinerU → Layout-Aware Markdown → Staging Environment   │
-└────────────────────┬────────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────────┐
-│            PHASE 2: ENTITY EXTRACTION & NORMALIZATION           │
-│  LLM Triplets → Entity Resolution (SapBERT) → Neo4j Ingestion   │
-└────────────────────┬────────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────────┐
-│         PHASE 3: HYBRID RETRIEVAL & MULTI-HOP REASONING         │
-│  Vector Similarity + Graph Traversal → LangGraph Reasoning      │
-└────────────────────┬────────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────────┐
-│        PHASE 4: EVALUATION & CITATION-BACKED UI (Streamlit)     │
-│  RAGAS Evaluation → Precision Citations → Dashboard with Evidence│
-└─────────────────────────────────────────────────────────────────┘
-```
-
-## ✨ The "Graph RAG" Advantage
-
-- **Multi-hop reasoning:** Answer questions like "What biological pathways are affected by drugs that treat Condition X?" by traversing the graph.
-- **Fact verification & explainability:** Every generated answer can be traced back to supporting nodes/edges and source studies.
-
-## 🛠️ 2026 Implementation Steps
-
-1. **Curate data**
-   - Download 20–50 relevant abstracts (PDF or text) from sources like PubMed.
-   - Organize metadata (title, authors, year, PMID).
-
-2. **Entity extraction**
-   - Use an LLM (or an NLP pipeline) to extract triplets: (Subject - Predicate - Object).
-   - Example: "Lisinopril is used to manage hypertension" → `(Drug:Lisinopril)-[:TREATS]->(Condition:Hypertension)`.
-
-3. **Build the knowledge graph**
-   - Store triplets in a graph database. For prototypes: **Neo4j Aura (free tier)** or **FalkorDB** (open-source, low-latency).
-
-4. **Retrieve & summarize**
-   - **Local search:** Query facts about a single node (e.g., a drug or gene).
-   - **Global search / community summaries:** Use libraries (e.g., Microsoft GraphRAG) to summarize communities and answer broader questions such as common side effects in a treatment category.
-
-5. **Evaluate**
-   - Use evaluation frameworks such as **RAGAS** to measure performance on multi-step medical questions and check for hallucinations or unsupported claims.
-
-## ⚖️ Notes & Ethics
-
-- This prototype is a research tool — **not clinical advice**. Always verify findings against primary literature and domain experts.
-- Ensure patient data privacy and adhere to regulatory guidelines when using clinical datasets.
-
-## 📌 Why this is a 2026 Trend
-
-Specialized Medical Graph RAG frameworks are gaining traction for handling private clinical data and reducing hallucinations in healthcare AI. They enable verifiable, citation-backed reasoning rather than black-box outputs.
+A sophisticated medical research assistant that bridges the gap between semantic search and structured knowledge reasoning. By combining **Neo4j knowledge graphs** with **Google Gemini**, MedGraph-RAG traverses complex medical relationships to answer multi-hop questions that confuse traditional vector-only systems.
 
 ---
 
-## Contributing & License
+## 🏗️ Architecture
 
-Contributions welcome. See the `LICENSE` file for license details.
+![MedGraph-RAG Architecture](data/Architecture.png)
+
+### **Core Capabilities**
+
+*   **🕸️ Hybrid Retrieval**: Merges vector similarity search (unstructured text) with graph traversal (structured relationships).
+*   **🧠 Chain-of-Graph Reasoning**: Uses **LangGraph** to "walk" the knowledge graph, discovering hidden connections between symptoms, diseases, and treatments.
+*   **✅ Self-Correcting**: Integrated **RAGAS** evaluation detects hallucinations and insufficient evidence in real-time.
+*   **🩺 Medical Precision**: Built on PubMed research papers, mapped to MeSH (Medical Subject Headings) terms.
+
+---
+
+## 🚀 Getting Started
+
+### **Deployment (DigitalOcean / Docker)**
+
+Deploy easily using the included Docker configuration.
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/HimathX/MedGraph-RAG.git
+cd MedGraph-RAG
+
+# 2. Add your API Key
+# Create a .env file with: GOOGLE_API_KEY, NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD
+
+# 3. Launch
+docker compose up -d --build
+```
+
+Access the app at `http://localhost:8501`.
+
+---
+
+### **Tech Stack**
+
+*   **Reasoning**: LangGraph, LangChain
+*   **Knowledge Graph**: Neo4j AuraDB (Graph + Vector Index)
+*   **LLM**: Google Gemini 2.0 Flash
+*   **Evaluation**: RAGAS
+*   **Interface**: Streamlit
+
+<br>
+
+<div align="center">
+  <p>Built with ❤️ by Himath Nimpura</p>
+</div>
